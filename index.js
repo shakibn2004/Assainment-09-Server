@@ -109,6 +109,25 @@ app.delete('/dashboard/my-listings/:id', async (req, res) => {
     }
 });
 
+// Data Edit/Update Route
+app.put('/dashboard/my-listings/:id', (req, res) => {
+    const userId = parseInt(req.params.id);
+    const { name, role } = req.body; // Frontend theke pathano data
+
+    // User-ti database-e ache kina khonja
+    let user = users.find(u => u.id === userId);
+
+    if (user) {
+        // Data update kora
+        user.name = name || user.name;
+        user.role = role || user.role;
+
+        res.status(200).json({ success: true, message: "Data updated successfully!", updatedUser: user });
+    } else {
+        res.status(404).json({ success: false, message: "User not found!" });
+    }
+});
+
 app.listen(8000, () => {
     console.log('Server running');
 });
