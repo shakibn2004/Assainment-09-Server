@@ -57,26 +57,26 @@ app.get('/', async (req, res) => {
 });
 
 
-    // Get Single User By ID
-    app.get('/public/all-pets/:id', async (req, res) => {
-      try {
+// Get Single User By ID
+app.get('/public/all-pets/:id', async (req, res) => {
+    try {
         const id = req.params.id;
 
         const query = {
-          _id: new ObjectId(id),
+            _id: new ObjectId(id),
         };
 
         const result = await allpets.findOne(query);
 
         res.send(result);
-      } catch (error) {
+    } catch (error) {
         res.status(500).send({
-          success: false,
-          message: 'Failed to fetch user',
-          error: error.message,
+            success: false,
+            message: 'Failed to fetch user',
+            error: error.message,
         });
-      }
-    });
+    }
+});
 
 
 
@@ -85,6 +85,28 @@ app.post('/dashboard/add-pet', async (req, res) => {
     const result = await allpets.insertOne(req.body);
     res.send(result);
     console.log(result);
+});
+
+// Delete User By ID
+app.delete('/dashboard/my-listings/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        console.log(id);
+
+        const query = {
+            _id: new ObjectId(id),
+        };
+
+        const result = await allpets.deleteOne(query);
+
+        res.send(result);
+    } catch (error) {
+        res.status(500).send({
+            success: false,
+            message: 'Failed to delete user',
+            error: error.message,
+        });
+    }
 });
 
 app.listen(8000, () => {
