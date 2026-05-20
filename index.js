@@ -81,6 +81,26 @@ app.get('/public/all-pets/:id', async (req, res) => {
 });
 
 
+// get api for getting all adopted pets
+app.get('/public/all-adopted-pets', async (req, res) => {
+    try {
+        const cursor = adoptedpets.find();
+        const result = await cursor.toArray();
+
+
+        res.send(result);
+    } catch (error) {
+        res.status(500).send({
+            success: false,
+            message: 'Failed to fetch users',
+            error: error.message,
+        });
+    }
+})
+
+
+
+
 
 
 app.post('/dashboard/add-pet', async (req, res) => {
