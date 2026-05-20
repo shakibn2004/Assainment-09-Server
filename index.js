@@ -25,6 +25,7 @@ app.use(express.json());
 
 // database and collection create and send data
 let allpets;
+let adoptedpets
 
 async function run() {
     try {
@@ -32,6 +33,7 @@ async function run() {
 
         const db = client.db("assainment-09-server");
         allpets = db.collection('allpets');
+        adoptedpets = db.collection('adoptedpets')
 
     } catch (error) {
         console.log(error);
@@ -87,6 +89,13 @@ app.post('/dashboard/add-pet', async (req, res) => {
     console.log(result);
 });
 
+// adopted pets api
+app.post('/public/all-pets/:id', async (req, res) => {
+    const result = await adoptedpets.insertOne(req.body);
+    res.send(result);
+    console.log(result);
+});
+
 // Delete User By ID
 app.delete('/dashboard/my-listings/:id', async (req, res) => {
     try {
@@ -110,22 +119,22 @@ app.delete('/dashboard/my-listings/:id', async (req, res) => {
 });
 
 // Data Edit/Update Route
-app.put('/dashboard/my-listings/:id', (req, res) => {
-    const userId = parseInt(req.params.id);
-    const { name, role } = req.body; // Frontend theke pathano data
+app.patch('/dashboard/my-listings/:id', async (req, res) => {
+    const userId = req.params.id;
+    const { name } = req.body; // Frontend theke pathano data
 
-    // User-ti database-e ache kina khonja
-    let user = users.find(u => u.id === userId);
+    const filter = { _id: new ObjectId(userId) };
 
-    if (user) {
-        // Data update kora
-        user.name = name || user.name;
-        user.role = role || user.role;
+    const updateDoc = {
+        $set: req.body
+    };
 
-        res.status(200).json({ success: true, message: "Data updated successfully!", updatedUser: user });
-    } else {
-        res.status(404).json({ success: false, message: "User not found!" });
-    }
+    const result = await allpets.updateOne(
+        filter,
+        updateDoc
+    );
+
+    res.send(result);
 });
 
 app.listen(8000, () => {
