@@ -159,10 +159,30 @@ app.delete('/dashboard/my-listings/:id', async (req, res) => {
     }
 });
 
+// Delete api is created for handling user adoptation cancel request
+app.delete('/dashboard/my-requests/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        console.log(id);
+        const query = {
+            _id: id,
+        };
+
+        const result = await adoptedpets.deleteOne(query);
+
+        res.send(result);
+    } catch (error) {
+        res.status(500).send({
+            success: false,
+            message: 'Failed to delete user',
+            error: error.message,
+        });
+    }
+});
+
 // Data Edit/Update Route
 app.patch('/dashboard/my-listings/:id', async (req, res) => {
     const userId = req.params.id;
-    const { name } = req.body; // Frontend theke pathano data
 
     const filter = { _id: new ObjectId(userId) };
 
@@ -174,7 +194,7 @@ app.patch('/dashboard/my-listings/:id', async (req, res) => {
         filter,
         updateDoc
     );
-
+console.log(req.body);
     res.send(result);
 });
 
