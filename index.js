@@ -98,7 +98,28 @@ app.get('/public/all-adopted-pets', async (req, res) => {
     }
 })
 
+// get a single adopedted pets by id
+app.get('/public/all-adopted-pets/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        
+        const query = {
+            _id: id,
+        };
+        console.log(query);
 
+        const result = await adoptedpets.findOne(query);
+
+        res.send(result);
+    } catch (error) {
+        res.status(500).send({
+            success: false,
+            message: 'Failed to fetch user',
+            error: error.message,
+        });
+       
+    }
+});
 
 
 
