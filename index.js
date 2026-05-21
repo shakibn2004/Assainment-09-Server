@@ -80,14 +80,11 @@ app.get('/public/all-pets/:id', async (req, res) => {
     }
 });
 
-
 // get api for getting all adopted pets
 app.get('/public/all-adopted-pets', async (req, res) => {
     try {
         const cursor = adoptedpets.find();
         const result = await cursor.toArray();
-
-
         res.send(result);
     } catch (error) {
         res.status(500).send({
@@ -123,7 +120,7 @@ app.get('/public/all-adopted-pets/:id', async (req, res) => {
 
 
 
-
+// post api for add-pet
 app.post('/dashboard/add-pet', async (req, res) => {
     const result = await allpets.insertOne(req.body);
     res.send(result);
