@@ -42,12 +42,19 @@ async function run() {
 
 run();
 
+const checkAuth = (req, res, next) => {
+    const header = req.headers.authorization;
+    console.log(req.headers.authorization);
+    if (header === 'login') {
+        next();
+    } else {
+        res.status(401).json({ message: 'unothorised' })
+    }
+};
+
 app.get('/', async (req, res) => {
     try {
-        const cursor = allpets.find();
-        const result = await cursor.toArray();
-        console.log(result);
-
+        const result = await allpets.find().toArray();
         res.send(result);
     } catch (error) {
         res.status(500).send({
@@ -78,6 +85,7 @@ app.get('/public/all-pets/:id', async (req, res) => {
             error: error.message,
         });
     }
+
 });
 
 // get api for getting all adopted pets
@@ -99,11 +107,10 @@ app.get('/public/all-adopted-pets', async (req, res) => {
 app.get('/public/all-adopted-pets/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        
+
         const query = {
             _id: id,
         };
-        console.log(query);
 
         const result = await adoptedpets.findOne(query);
 
@@ -114,7 +121,7 @@ app.get('/public/all-adopted-pets/:id', async (req, res) => {
             message: 'Failed to fetch user',
             error: error.message,
         });
-       
+
     }
 });
 
@@ -124,21 +131,18 @@ app.get('/public/all-adopted-pets/:id', async (req, res) => {
 app.post('/dashboard/add-pet', async (req, res) => {
     const result = await allpets.insertOne(req.body);
     res.send(result);
-    console.log(result);
 });
 
 // adopted pets api
 app.post('/public/all-pets/:id', async (req, res) => {
     const result = await adoptedpets.insertOne(req.body);
     res.send(result);
-    console.log(result);
 });
 
 // Delete User By ID
 app.delete('/dashboard/my-listings/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        console.log(id);
 
         const query = {
             _id: new ObjectId(id),
@@ -154,13 +158,13 @@ app.delete('/dashboard/my-listings/:id', async (req, res) => {
             error: error.message,
         });
     }
+
 });
 
 // Delete api is created for handling user adoptation cancel request
 app.delete('/dashboard/my-requests/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        console.log(id);
         const query = {
             _id: id,
         };
@@ -178,6 +182,24 @@ app.delete('/dashboard/my-requests/:id', async (req, res) => {
 });
 
 // Data Edit/Update Route
+app.patch('/public/all-adopted-pets/:id', async (req, res) => {
+    const userId = req.params.id;
+
+    const filter = { _id: userId };
+
+    const updateDoc = {
+        $set: req.body
+    };
+
+    const result = await adoptedpets.updateOne(
+        filter,
+        updateDoc
+    );
+    res.send(result);
+});
+
+
+// Data Edit/Update Route
 app.patch('/dashboard/my-listings/:id', async (req, res) => {
     const userId = req.params.id;
 
@@ -191,9 +213,10 @@ app.patch('/dashboard/my-listings/:id', async (req, res) => {
         filter,
         updateDoc
     );
-console.log(req.body);
     res.send(result);
+    console.log(updateDoc);
 });
+
 
 app.listen(8000, () => {
     console.log('Server running');
